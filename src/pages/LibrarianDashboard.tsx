@@ -238,13 +238,13 @@ export default function LibrarianDashboard() {
   return (
     <div className="min-h-screen bg-background">
       <Header user={user} onEditDetails={() => setEditOpen(true)} onChangePassword={() => setPassOpen(true)} onSettings={() => setSettingsOpen(true)} />
-      <main className="max-w-5xl mx-auto px-6 py-8">
-        <h1 className="text-2xl font-bold mb-6 animate-fade-in">Library Management</h1>
+      <main className="w-full mx-auto px-3 sm:px-4 md:px-6 py-4 sm:py-6 md:py-8">
+        <h1 className="text-xl sm:text-2xl md:text-3xl font-bold mb-4 sm:mb-6 animate-fade-in">Library Management</h1>
 
-        <div className="flex gap-6 border-b mb-6">
+        <div className="flex gap-2 sm:gap-6 border-b mb-4 sm:mb-6 overflow-x-auto">
           {tabs.map(t => (
             <button key={t.key} onClick={() => setTab(t.key)}
-              className={`pb-3 text-sm font-medium relative transition-colors ${tab === t.key ? 'text-maroon' : 'text-muted-foreground hover:text-foreground'}`}>
+              className={`pb-3 text-xs sm:text-sm font-medium relative transition-colors whitespace-nowrap ${tab === t.key ? 'text-maroon' : 'text-muted-foreground hover:text-foreground'}`}>
               {t.label}
               {tab === t.key && (
                 <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-maroon rounded-full transition-all" />
@@ -255,35 +255,45 @@ export default function LibrarianDashboard() {
 
         {tab === 'catalog' && (
           <>
-            <div className="flex items-center justify-between mb-4">
-              <div><h2 className="text-lg font-bold">Book Catalog</h2><p className="text-sm text-muted-foreground">Manage library books and inventory</p></div>
-              <Button onClick={() => setAddOpen(true)} className="bg-maroon hover:bg-maroon/90 text-maroon-foreground transition-all hover:shadow-md active:scale-[0.98]"><Plus className="w-4 h-4 mr-1" /> Add Book</Button>
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4 mb-4 sm:mb-6">
+              <div><h2 className="text-sm sm:text-lg font-bold">Book Catalog</h2><p className="text-xs sm:text-sm text-muted-foreground">Manage library books and inventory</p></div>
+              <Button onClick={() => setAddOpen(true)} className="bg-maroon hover:bg-maroon/90 text-maroon-foreground transition-all hover:shadow-md active:scale-[0.98] text-xs sm:text-sm w-full sm:w-auto"><Plus className="w-4 h-4 mr-1" /> Add Book</Button>
             </div>
-            <div className="flex gap-3 mb-4">
+            <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 mb-4">
               <div className="relative flex-1">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                <Input placeholder="Search books..." value={search} onChange={e => setSearch(e.target.value)} className="pl-10" />
+                <Input placeholder="Search books..." value={search} onChange={e => setSearch(e.target.value)} className="pl-10 text-xs sm:text-sm" />
               </div>
-              <div className="flex gap-2">
-                <Button variant="outline" onClick={() => { setBooksList(getBooks()); setLoansList(getLoans()); }} className="transition-all hover:shadow-sm active:scale-[0.98]"><RefreshCw className="w-4 h-4 mr-1" /> Refresh</Button>
-              </div>
+              <Button variant="outline" onClick={() => { setBooksList(getBooks()); setLoansList(getLoans()); }} className="transition-all hover:shadow-sm active:scale-[0.98] text-xs sm:text-sm w-full sm:w-auto"><RefreshCw className="w-4 h-4 mr-1" /> Refresh</Button>
             </div>
             
-            <div className="bg-card rounded-lg border overflow-hidden">
-              <table className="w-full">
-                <thead><tr className="border-b"><th className="text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider p-4">Title</th><th className="text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider p-4">Author</th><th className="text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider p-4">Category</th><th className="text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider p-4">Status</th><th className="text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider p-4">Actions</th></tr></thead>
+            <div className="bg-card rounded-lg border overflow-x-auto">
+              <table className="w-full text-xs sm:text-sm">
+                <thead>
+                  <tr className="border-b">
+                    <th className="text-left font-semibold text-muted-foreground uppercase tracking-wider p-2 sm:p-4">Title</th>
+                    <th className="text-left font-semibold text-muted-foreground uppercase tracking-wider p-2 sm:p-4">Author</th>
+                    <th className="text-left font-semibold text-muted-foreground uppercase tracking-wider p-2 sm:p-4">Category</th>
+                    <th className="text-left font-semibold text-muted-foreground uppercase tracking-wider p-2 sm:p-4">Status</th>
+                    <th className="text-left font-semibold text-muted-foreground uppercase tracking-wider p-2 sm:p-4">Actions</th>
+                  </tr>
+                </thead>
                 <tbody>
                   {filteredBooks.length === 0 ? (
-                    <tr><td colSpan={5} className="p-8 text-center text-muted-foreground">No books found</td></tr>
+                    <tr><td colSpan={5} className="p-4 sm:p-8 text-center text-muted-foreground text-xs sm:text-sm">No books found</td></tr>
                   ) : filteredBooks.map(book => (
                     <tr key={book.id} className="border-b last:border-0 transition-colors hover:bg-muted/50">
-                      <td className="p-4 text-sm font-medium">{book.title}</td>
-                      <td className="p-4 text-sm text-muted-foreground">{book.author}</td>
-                      <td className="p-4 text-sm text-muted-foreground">{book.category}</td>
-                      <td className="p-4"><span className={`text-xs font-semibold px-2 py-1 rounded ${book.status === 'available' ? 'bg-success/10 text-success' : 'bg-warning/10 text-warning'}`}>{book.status === 'available' ? 'Available' : 'Borrowed'}</span></td>
-                      <td className="p-4 flex items-center gap-2">
-                        <Button size="sm" variant="ghost" onClick={() => openEditBook(book)} className="text-foreground hover:text-foreground transition-all hover:scale-105"><Edit2 className="w-4 h-4" /></Button>
-                        <Button size="sm" variant="ghost" onClick={() => handleDeleteBook(book.id)} className="text-destructive hover:text-destructive transition-all hover:scale-105"><Trash2 className="w-4 h-4" /></Button>
+                      <td className="p-2 sm:p-4 font-medium truncate text-xs sm:text-sm">{book.title}</td>
+                      <td className="p-2 sm:p-4 text-muted-foreground truncate text-xs sm:text-sm">{book.author}</td>
+                      <td className="p-2 sm:p-4 text-muted-foreground truncate text-xs sm:text-sm">{book.category}</td>
+                      <td className="p-2 sm:p-4">
+                        <span className={`text-xs font-semibold px-2 py-1 rounded ${book.status === 'available' ? 'bg-success/10 text-success' : 'bg-warning/10 text-warning'}`}>
+                          {book.status === 'available' ? 'Available' : 'Borrowed'}
+                        </span>
+                      </td>
+                      <td className="p-2 sm:p-4 flex items-center gap-1 sm:gap-2">
+                        <Button size="sm" variant="ghost" onClick={() => openEditBook(book)} className="text-foreground hover:text-foreground transition-all hover:scale-105 p-1 sm:p-2"><Edit2 className="w-3 h-3 sm:w-4 sm:h-4" /></Button>
+                        <Button size="sm" variant="ghost" onClick={() => handleDeleteBook(book.id)} className="text-destructive hover:text-destructive transition-all hover:scale-105 p-1 sm:p-2"><Trash2 className="w-3 h-3 sm:w-4 sm:h-4" /></Button>
                       </td>
                     </tr>
                   ))}
@@ -348,21 +358,28 @@ export default function LibrarianDashboard() {
               </table>
             </div>
 
-            <h3 className="font-bold mb-3">Return Requests</h3>
-            <div className="bg-card rounded-lg border overflow-hidden mb-8">
-              <table className="w-full">
-                <thead><tr className="border-b"><th className="text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider p-4">Book</th><th className="text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider p-4">Borrower</th><th className="text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider p-4">Borrowed Date</th><th className="text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider p-4">Actions</th></tr></thead>
+            <h3 className="text-sm sm:text-base font-bold mb-3">Return Requests</h3>
+            <div className="bg-card rounded-lg border overflow-x-auto mb-6 sm:mb-8">
+              <table className="w-full text-xs sm:text-sm">
+                <thead>
+                  <tr className="border-b">
+                    <th className="text-left font-semibold text-muted-foreground uppercase tracking-wider p-2 sm:p-4">Book</th>
+                    <th className="text-left font-semibold text-muted-foreground uppercase tracking-wider p-2 sm:p-4">Borrower</th>
+                    <th className="text-left font-semibold text-muted-foreground uppercase tracking-wider p-2 sm:p-4">Date</th>
+                    <th className="text-left font-semibold text-muted-foreground uppercase tracking-wider p-2 sm:p-4">Actions</th>
+                  </tr>
+                </thead>
                 <tbody>
                   {pendingReturns.length === 0 ? (
-                    <tr><td colSpan={4} className="p-6 text-center text-muted-foreground">No return requests</td></tr>
+                    <tr><td colSpan={4} className="p-4 sm:p-6 text-center text-muted-foreground text-xs sm:text-sm">No return requests</td></tr>
                   ) : pendingReturns.map(l => (
                     <tr key={l.id} className="border-b last:border-0 transition-colors hover:bg-muted/50">
-                      <td className="p-4 text-sm font-medium">{getBookTitle(l.bookId)}</td>
-                      <td className="p-4 text-sm">{getBorrowerName(l.borrowerId)}</td>
-                      <td className="p-4 text-sm text-muted-foreground">{l.borrowDate}</td>
-                      <td className="p-4 flex gap-2">
-                        <Button size="sm" onClick={() => handleAccept(l.id, 'return')} className="bg-success hover:bg-success/90 text-success-foreground transition-all active:scale-[0.98]"><Check className="w-3 h-3 mr-1" /> Accept</Button>
-                        <Button size="sm" variant="outline" onClick={() => handleDecline(l.id)} className="text-destructive border-destructive hover:bg-destructive/10 transition-all active:scale-[0.98]"><X className="w-3 h-3 mr-1" /> Decline</Button>
+                      <td className="p-2 sm:p-4 font-medium text-xs sm:text-sm truncate">{getBookTitle(l.bookId)}</td>
+                      <td className="p-2 sm:p-4 text-xs sm:text-sm truncate">{getBorrowerName(l.borrowerId)}</td>
+                      <td className="p-2 sm:p-4 text-muted-foreground text-xs sm:text-sm">{l.borrowDate}</td>
+                      <td className="p-2 sm:p-4 flex gap-1 sm:gap-2 flex-wrap">
+                        <Button size="sm" onClick={() => handleAccept(l.id, 'return')} className="bg-success hover:bg-success/90 text-success-foreground text-xs transition-all active:scale-[0.98]"><Check className="w-3 h-3 mr-1" /> Accept</Button>
+                        <Button size="sm" variant="outline" onClick={() => handleDecline(l.id)} className="text-destructive border-destructive hover:bg-destructive/10 text-xs transition-all active:scale-[0.98]"><X className="w-3 h-3 mr-1" /> Decline</Button>
                       </td>
                     </tr>
                   ))}
@@ -370,21 +387,28 @@ export default function LibrarianDashboard() {
               </table>
             </div>
 
-            <h3 className="font-bold mb-3">Renewal Requests</h3>
-            <div className="bg-card rounded-lg border overflow-hidden">
-              <table className="w-full">
-                <thead><tr className="border-b"><th className="text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider p-4">Book</th><th className="text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider p-4">Borrower</th><th className="text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider p-4">Current Due Date</th><th className="text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider p-4">Actions</th></tr></thead>
+            <h3 className="text-sm sm:text-base font-bold mb-3">Renewal Requests</h3>
+            <div className="bg-card rounded-lg border overflow-x-auto">
+              <table className="w-full text-xs sm:text-sm">
+                <thead>
+                  <tr className="border-b">
+                    <th className="text-left font-semibold text-muted-foreground uppercase tracking-wider p-2 sm:p-4">Book</th>
+                    <th className="text-left font-semibold text-muted-foreground uppercase tracking-wider p-2 sm:p-4">Borrower</th>
+                    <th className="text-left font-semibold text-muted-foreground uppercase tracking-wider p-2 sm:p-4">Due Date</th>
+                    <th className="text-left font-semibold text-muted-foreground uppercase tracking-wider p-2 sm:p-4">Actions</th>
+                  </tr>
+                </thead>
                 <tbody>
                   {pendingRenewals.length === 0 ? (
-                    <tr><td colSpan={4} className="p-6 text-center text-muted-foreground">No renewal requests</td></tr>
+                    <tr><td colSpan={4} className="p-4 sm:p-6 text-center text-muted-foreground text-xs sm:text-sm">No renewal requests</td></tr>
                   ) : pendingRenewals.map(l => (
                     <tr key={l.id} className="border-b last:border-0 transition-colors hover:bg-muted/50">
-                      <td className="p-4 text-sm font-medium">{getBookTitle(l.bookId)}</td>
-                      <td className="p-4 text-sm">{getBorrowerName(l.borrowerId)}</td>
-                      <td className="p-4 text-sm text-muted-foreground">{l.dueDate}</td>
-                      <td className="p-4 flex gap-2">
-                        <Button size="sm" onClick={() => handleAccept(l.id, 'renewal')} className="bg-success hover:bg-success/90 text-success-foreground transition-all active:scale-[0.98]"><Check className="w-3 h-3 mr-1" /> Accept</Button>
-                        <Button size="sm" variant="outline" onClick={() => handleDecline(l.id)} className="text-destructive border-destructive hover:bg-destructive/10 transition-all active:scale-[0.98]"><X className="w-3 h-3 mr-1" /> Decline</Button>
+                      <td className="p-2 sm:p-4 font-medium text-xs sm:text-sm truncate">{getBookTitle(l.bookId)}</td>
+                      <td className="p-2 sm:p-4 text-xs sm:text-sm truncate">{getBorrowerName(l.borrowerId)}</td>
+                      <td className="p-2 sm:p-4 text-muted-foreground text-xs sm:text-sm">{l.dueDate}</td>
+                      <td className="p-2 sm:p-4 flex gap-1 sm:gap-2 flex-wrap">
+                        <Button size="sm" onClick={() => handleAccept(l.id, 'renewal')} className="bg-success hover:bg-success/90 text-success-foreground text-xs transition-all active:scale-[0.98]"><Check className="w-3 h-3 mr-1" /> Accept</Button>
+                        <Button size="sm" variant="outline" onClick={() => handleDecline(l.id)} className="text-destructive border-destructive hover:bg-destructive/10 text-xs transition-all active:scale-[0.98]"><X className="w-3 h-3 mr-1" /> Decline</Button>
                       </td>
                     </tr>
                   ))}

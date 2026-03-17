@@ -30,26 +30,26 @@ export default function Header({ user, onEditDetails, onChangePassword, onSettin
   const badgeClass = 'bg-white text-maroon text-xs font-semibold px-2 py-0.5 rounded border border-maroon/10 shadow-sm';
 
   return (
-    <header className="bg-maroon text-maroon-foreground">
-      <div className="max-w-7xl mx-auto flex items-center justify-between px-6 py-3">
-        <div className="flex items-center gap-3">
-          <img src={logoUrl} alt="SSCR" className="w-8 h-8 rounded-full bg-white/5 object-cover" />
-          <span className="font-semibold tracking-wide text-sm uppercase">SSCR - LIBRARY</span>
+    <header className="bg-maroon text-maroon-foreground sticky top-0 z-40">
+      <div className="mx-auto flex items-center justify-between px-3 sm:px-4 md:px-6 py-2 sm:py-3">
+        <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+          <img src={logoUrl} alt="SSCR" className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-white/5 object-cover flex-shrink-0" />
+          <span className="font-semibold tracking-wide text-xs sm:text-sm uppercase truncate">SSCR - LIBRARY</span>
         </div>
 
-        <div className="relative" ref={ref}>
+        <div className="relative flex-shrink-0" ref={ref}>
           <button
             onClick={() => setOpen(!open)}
-            className="flex items-center gap-2 hover:opacity-80 transition-all"
+            className="flex items-center gap-1 sm:gap-2 hover:opacity-80 transition-all"
           >
-            <div className="w-8 h-8 rounded-full bg-maroon-foreground/20 flex items-center justify-center text-sm font-semibold">
+            <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-maroon-foreground/20 flex items-center justify-center text-xs sm:text-sm font-semibold flex-shrink-0">
               {user.fullName[0]}
             </div>
-            <span className="text-sm font-medium flex items-center gap-2">
-              <span>{user.fullName}</span>
-              <span className={badgeClass}>{roleLabel}</span>
+            <span className="hidden md:flex items-center gap-2">
+              <span className="text-xs sm:text-sm font-medium truncate max-w-[120px]">{user.fullName}</span>
+              <span className={`${badgeClass} hidden sm:inline`}>{roleLabel}</span>
             </span>
-            <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${open ? 'rotate-180' : ''}`} />
+            <ChevronDown className={`w-3 h-3 sm:w-4 sm:h-4 transition-transform duration-200 flex-shrink-0 ${open ? 'rotate-180' : ''}`} />
           </button>
 
           {open && (
