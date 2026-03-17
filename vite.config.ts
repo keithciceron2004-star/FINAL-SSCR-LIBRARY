@@ -5,7 +5,9 @@ import { componentTagger } from "lovable-tagger";
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
-  base: process.env.VITE_BASE_URL || '/',
+  base:
+    process.env.VITE_BASE_URL ||
+    (process.env.NODE_ENV === "production" ? "/FINAL-SSCR-LIBRARY/" : "/"),
   server: {
     host: "::",
     port: 8080,
