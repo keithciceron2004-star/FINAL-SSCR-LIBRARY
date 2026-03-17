@@ -8,6 +8,8 @@ import ForgotPasswordDialog from '@/components/ForgotPasswordDialog';
 import { login } from '@/lib/store';
 import { toast } from 'sonner';
 
+const logoUrl = `${import.meta.env.BASE_URL}favicon.png`;
+
 export default function Login() {
   const [schoolId, setSchoolId] = useState('');
   const [password, setPassword] = useState('');
@@ -25,7 +27,7 @@ export default function Login() {
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-background px-4">
       <div className="flex flex-col items-center mb-8 animate-fade-in">
-        <img src="/favicon.png" alt="SSCR logo" className="w-20 h-20 rounded-full mb-4 object-cover bg-white/5" />
+        <img src={logoUrl} alt="SSCR logo" className="w-20 h-20 rounded-full mb-4 object-cover bg-white/5" />
         <h1 className="text-2xl font-bold text-foreground">San Sebastian College Recoletos</h1>
         <p className="text-muted-foreground text-sm italic mt-1">Caritas Et Scientia</p>
       </div>

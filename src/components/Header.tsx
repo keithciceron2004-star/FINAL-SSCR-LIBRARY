@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { LogOut, Pencil, KeyRound, ChevronDown, Settings } from 'lucide-react';
 import { getCurrentUser, logout, type User } from '@/lib/store';
 
+const logoUrl = `${import.meta.env.BASE_URL}favicon.png`;
+
 interface HeaderProps {
   user: User;
   onEditDetails: () => void;
@@ -31,7 +33,7 @@ export default function Header({ user, onEditDetails, onChangePassword, onSettin
     <header className="bg-maroon text-maroon-foreground">
       <div className="max-w-7xl mx-auto flex items-center justify-between px-6 py-3">
         <div className="flex items-center gap-3">
-          <img src="/favicon.png" alt="SSCR" className="w-8 h-8 rounded-full bg-white/5 object-cover" />
+          <img src={logoUrl} alt="SSCR" className="w-8 h-8 rounded-full bg-white/5 object-cover" />
           <span className="font-semibold tracking-wide text-sm uppercase">SSCR - LIBRARY</span>
         </div>
 
