@@ -39,7 +39,16 @@ export default function LibrarianDashboard() {
   const [passOpen, setPassOpen] = useState(user?.mustChangePassword ?? false);
   const [settingsOpen, setSettingsOpen] = useState(false);
 
-  useEffect(() => { if (!user || user.role !== 'librarian') navigate('/'); }, [user]);
+  // Auth check on mount and when user changes
+  useEffect(() => {
+    const currentUser = getCurrentUser();
+    if (!currentUser || currentUser.role !== 'librarian') {
+      navigate('/');
+    } else {
+      setUser(currentUser);
+    }
+  }, [navigate]);
+
   if (!user) return null;
 
   const users = getUsers();

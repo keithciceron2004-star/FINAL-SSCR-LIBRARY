@@ -33,7 +33,15 @@ export default function SupervisorDashboard() {
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [now, setNow] = useState(new Date());
 
-  useEffect(() => { if (!user || user.role !== 'supervisor') navigate('/'); }, [user]);
+  // Auth check on mount and when user changes
+  useEffect(() => {
+    const currentUser = getCurrentUser();
+    if (!currentUser || currentUser.role !== 'supervisor') {
+      navigate('/');
+    } else {
+      setUser(currentUser);
+    }
+  }, [navigate]);
 
   // Live clock
   useEffect(() => {

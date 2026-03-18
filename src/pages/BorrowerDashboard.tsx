@@ -21,7 +21,16 @@ export default function BorrowerDashboard() {
   const [editOpen, setEditOpen] = useState(false);
   const [passOpen, setPassOpen] = useState(user?.mustChangePassword ?? false);
 
-  useEffect(() => { if (!user || (user.role !== 'student' && user.role !== 'faculty')) navigate('/'); }, [user]);
+  // Auth check on mount and when user changes
+  useEffect(() => {
+    const currentUser = getCurrentUser();
+    if (!currentUser || (currentUser.role !== 'student' && currentUser.role !== 'faculty')) {
+      navigate('/');
+    } else {
+      setUser(currentUser);
+    }
+  }, [navigate]);
+
   if (!user) return null;
 
   const myLoans = loans.filter(l => l.borrowerId === user.id && (l.status === 'active' || l.status === 'pending' || l.status === 'pending_return' || l.status === 'pending_renewal'));
