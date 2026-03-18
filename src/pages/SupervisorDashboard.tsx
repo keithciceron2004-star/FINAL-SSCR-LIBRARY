@@ -32,6 +32,7 @@ export default function SupervisorDashboard() {
   const [passOpen, setPassOpen] = useState(user?.mustChangePassword ?? false);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [now, setNow] = useState(new Date());
+  const [dataVersion, setDataVersion] = useState(0);
 
   // Auth check on mount and when user changes
   useEffect(() => {
@@ -55,7 +56,7 @@ export default function SupervisorDashboard() {
   const faculty = allUsers.filter(u => u.role === 'faculty');
   const librarians = allUsers.filter(u => u.role === 'librarian');
   const borrowersCount = students.length + faculty.length;
-  const books = getBooks();
+  const books = dataVersion >= 0 ? getBooks() : getBooks();
 
   let filtered = (filterTab === 'students' ? students : filterTab === 'faculty' ? faculty : librarians).filter(u =>
     u.fullName.toLowerCase().includes(search.toLowerCase()) || u.schoolId.includes(search)
@@ -92,9 +93,8 @@ export default function SupervisorDashboard() {
     if (!b) return;
     if (!window.confirm(`Delete book "${b.title}" by ${b.author}? This will also delete all associated loans. This action cannot be undone.`)) return;
     deleteBookCascade(bookId);
-    // Force re-render by fetching updated state
-    const updatedBooks = getBooks();
-    // State update not needed here since component will re-render, but ensure data is synchronized
+    // Trigger re-render by updating dataVersion
+    setDataVersion(prev => prev + 1);
     toast.success('Book and all associated loans deleted');
   };
 
