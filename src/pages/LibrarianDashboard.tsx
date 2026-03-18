@@ -8,7 +8,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import Header from '@/components/Header';
 import EditDetailsDialog from '@/components/EditDetailsDialog';
 import ChangePasswordDialog from '@/components/ChangePasswordDialog';
-import { getCurrentUser, getBooks, setBooks, getLoans, setLoans, getUsers, genId, type User, type Book } from '@/lib/store';
+import { getCurrentUser, getBooks, setBooks, getLoans, setLoans, getUsers, genId, deleteBookCascade, type User, type Book } from '@/lib/store';
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select';
 import { toast } from 'sonner';
 
@@ -88,9 +88,11 @@ export default function LibrarianDashboard() {
   const handleDeleteBook = (id: string) => {
     const book = books.find(b => b.id === id);
     if (!book) return;
-    if (!window.confirm(`Delete book "${book.title}" by ${book.author}? This action cannot be undone.`)) return;
-    const updated = books.filter(b => b.id !== id); setBooks(updated); setBooksList(updated);
-    toast.success('Book deleted');
+    if (!window.confirm(`Delete book "${book.title}" by ${book.author}? This will also delete all associated loans. This action cannot be undone.`)) return;
+    deleteBookCascade(id);
+    setBooksList(getBooks());
+    setLoansList(getLoans());
+    toast.success('Book and all associated loans deleted');
   };
 
   const handleClearBorrowers = () => {
@@ -238,13 +240,13 @@ export default function LibrarianDashboard() {
   return (
     <div className="min-h-screen bg-background">
       <Header user={user} onEditDetails={() => setEditOpen(true)} onChangePassword={() => setPassOpen(true)} onSettings={() => setSettingsOpen(true)} />
-      <main className="max-w-5xl mx-auto px-6 py-8">
-        <h1 className="text-2xl font-bold mb-6 animate-fade-in">Library Management</h1>
+      <main className="w-full mx-auto px-3 sm:px-4 md:px-6 py-4 sm:py-6 md:py-8">
+        <h1 className="text-xl sm:text-2xl md:text-3xl font-bold mb-4 sm:mb-6 animate-fade-in">Library Management</h1>
 
-        <div className="flex gap-6 border-b mb-6">
+        <div className="flex gap-2 sm:gap-6 border-b mb-4 sm:mb-6 overflow-x-auto">
           {tabs.map(t => (
             <button key={t.key} onClick={() => setTab(t.key)}
-              className={`pb-3 text-sm font-medium relative transition-colors ${tab === t.key ? 'text-maroon' : 'text-muted-foreground hover:text-foreground'}`}>
+              className={`pb-3 text-xs sm:text-sm font-medium relative transition-colors whitespace-nowrap ${tab === t.key ? 'text-maroon' : 'text-muted-foreground hover:text-foreground'}`}>
               {t.label}
               {tab === t.key && (
                 <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-maroon rounded-full transition-all" />
@@ -255,56 +257,101 @@ export default function LibrarianDashboard() {
 
         {tab === 'catalog' && (
           <>
-            <div className="flex items-center justify-between mb-4">
-              <div><h2 className="text-lg font-bold">Book Catalog</h2><p className="text-sm text-muted-foreground">Manage library books and inventory</p></div>
-              <Button onClick={() => setAddOpen(true)} className="bg-maroon hover:bg-maroon/90 text-maroon-foreground transition-all hover:shadow-md active:scale-[0.98]"><Plus className="w-4 h-4 mr-1" /> Add Book</Button>
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4 mb-4 sm:mb-6">
+              <div><h2 className="text-sm sm:text-lg font-bold">Book Catalog</h2><p className="text-xs sm:text-sm text-muted-foreground">Manage library books and inventory</p></div>
+              <Button onClick={() => setAddOpen(true)} className="bg-maroon hover:bg-maroon/90 text-maroon-foreground transition-all hover:shadow-md active:scale-[0.98] text-xs sm:text-sm w-full sm:w-auto"><Plus className="w-3 h-3 sm:w-4 sm:h-4 mr-1" /> Add Book</Button>
             </div>
-            <div className="flex gap-3 mb-4">
+            <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 mb-4">
               <div className="relative flex-1">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                <Input placeholder="Search books..." value={search} onChange={e => setSearch(e.target.value)} className="pl-10" />
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground flex-shrink-0" />
+                <Input placeholder="Search books..." value={search} onChange={e => setSearch(e.target.value)} className="pl-10 text-xs sm:text-sm" />
               </div>
-              <div className="flex gap-2">
-                <Button variant="outline" onClick={() => { setBooksList(getBooks()); setLoansList(getLoans()); }} className="transition-all hover:shadow-sm active:scale-[0.98]"><RefreshCw className="w-4 h-4 mr-1" /> Refresh</Button>
-              </div>
+              <Button variant="outline" onClick={() => { setBooksList(getBooks()); setLoansList(getLoans()); }} className="transition-all hover:shadow-sm active:scale-[0.98] text-xs sm:text-sm w-full sm:w-auto"><RefreshCw className="w-3 h-3 sm:w-4 sm:h-4 mr-1" /> Refresh</Button>
             </div>
             
             <div className="bg-card rounded-lg border overflow-hidden">
-              <table className="w-full">
-                <thead><tr className="border-b"><th className="text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider p-4">Title</th><th className="text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider p-4">Author</th><th className="text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider p-4">Category</th><th className="text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider p-4">Status</th><th className="text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider p-4">Actions</th></tr></thead>
-                <tbody>
-                  {filteredBooks.length === 0 ? (
-                    <tr><td colSpan={5} className="p-8 text-center text-muted-foreground">No books found</td></tr>
-                  ) : filteredBooks.map(book => (
-                    <tr key={book.id} className="border-b last:border-0 transition-colors hover:bg-muted/50">
-                      <td className="p-4 text-sm font-medium">{book.title}</td>
-                      <td className="p-4 text-sm text-muted-foreground">{book.author}</td>
-                      <td className="p-4 text-sm text-muted-foreground">{book.category}</td>
-                      <td className="p-4"><span className={`text-xs font-semibold px-2 py-1 rounded ${book.status === 'available' ? 'bg-success/10 text-success' : 'bg-warning/10 text-warning'}`}>{book.status === 'available' ? 'Available' : 'Borrowed'}</span></td>
-                      <td className="p-4 flex items-center gap-2">
-                        <Button size="sm" variant="ghost" onClick={() => openEditBook(book)} className="text-foreground hover:text-foreground transition-all hover:scale-105"><Edit2 className="w-4 h-4" /></Button>
-                        <Button size="sm" variant="ghost" onClick={() => handleDeleteBook(book.id)} className="text-destructive hover:text-destructive transition-all hover:scale-105"><Trash2 className="w-4 h-4" /></Button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+              {/* Mobile Card View */}
+              <div className="block md:hidden space-y-3 p-3 sm:p-4">
+                {filteredBooks.length === 0 ? (
+                  <p className="p-4 text-center text-muted-foreground text-xs sm:text-sm">No books found</p>
+                ) : filteredBooks.map(book => (
+                  <div key={book.id} className="border rounded-lg p-3 sm:p-4 space-y-2 hover:bg-muted/50 transition-colors">
+                    <div className="flex justify-between items-start gap-2">
+                      <div className="flex-1 min-w-0">
+                        <p className="font-semibold text-sm truncate">{book.title}</p>
+                        <p className="text-xs text-muted-foreground truncate">by {book.author}</p>
+                        <p className="text-xs text-muted-foreground">{book.category}</p>
+                      </div>
+                      <span className={`text-xs font-semibold px-2 py-1 rounded whitespace-nowrap flex-shrink-0 ${book.status === 'available' ? 'bg-success/10 text-success' : 'bg-warning/10 text-warning'}`}>
+                        {book.status === 'available' ? 'Available' : 'Borrowed'}
+                      </span>
+                    </div>
+                    <div className="flex gap-2 pt-2">
+                      <Button size="sm" variant="ghost" onClick={() => openEditBook(book)} className="text-foreground hover:text-foreground transition-all p-1 sm:p-2 flex-1"><Edit2 className="w-3 h-3 sm:w-4 sm:h-4" /></Button>
+                      <Button size="sm" variant="ghost" onClick={() => handleDeleteBook(book.id)} className="text-destructive hover:text-destructive transition-all p-1 sm:p-2 flex-1"><Trash2 className="w-3 h-3 sm:w-4 sm:h-4" /></Button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              
+              {/* Desktop Table View */}
+              <div className="hidden md:block overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead><tr className="border-b"><th className="text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider p-4">Title</th><th className="text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider p-4">Author</th><th className="text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider p-4">Category</th><th className="text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider p-4">Status</th><th className="text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider p-4">Actions</th></tr></thead>
+                  <tbody>
+                    {filteredBooks.length === 0 ? (
+                      <tr><td colSpan={5} className="p-8 text-center text-muted-foreground text-xs sm:text-sm">No books found</td></tr>
+                    ) : filteredBooks.map(book => (
+                      <tr key={book.id} className="border-b last:border-0 transition-colors hover:bg-muted/50">
+                        <td className="p-4 text-sm font-medium">{book.title}</td>
+                        <td className="p-4 text-sm text-muted-foreground">{book.author}</td>
+                        <td className="p-4 text-sm text-muted-foreground">{book.category}</td>
+                        <td className="p-4"><span className={`text-xs font-semibold px-2 py-1 rounded ${book.status === 'available' ? 'bg-success/10 text-success' : 'bg-warning/10 text-warning'}`}>{book.status === 'available' ? 'Available' : 'Borrowed'}</span></td>
+                        <td className="p-4 flex items-center gap-2">
+                          <Button size="sm" variant="ghost" onClick={() => openEditBook(book)} className="text-foreground hover:text-foreground transition-all hover:scale-105 p-1 sm:p-2"><Edit2 className="w-3 h-3 sm:w-4 sm:h-4" /></Button>
+                          <Button size="sm" variant="ghost" onClick={() => handleDeleteBook(book.id)} className="text-destructive hover:text-destructive transition-all hover:scale-105 p-1 sm:p-2"><Trash2 className="w-3 h-3 sm:w-4 sm:h-4" /></Button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             </div>
           </>
         )}
 
         {tab === 'borrowers' && (
           <div className="bg-card rounded-lg border overflow-hidden">
-            <div className="p-4 border-b flex items-center justify-between">
+            <div className="p-3 sm:p-4 border-b flex items-center justify-between">
               <div>
-                <p className="text-sm text-maroon font-semibold">Borrowers</p>
-                <p className="text-2xl font-bold">{loans.filter(l => l.status !== 'returned' && (user.yearLevel ? books.find(b => b.id === l.bookId)?.yearLevel === user.yearLevel : true)).length}</p>
+                <p className="text-xs sm:text-sm text-maroon font-semibold">Borrowers</p>
+                <p className="text-xl sm:text-2xl font-bold">{loans.filter(l => l.status !== 'returned' && (user.yearLevel ? books.find(b => b.id === l.bookId)?.yearLevel === user.yearLevel : true)).length}</p>
               </div>
               <div />
             </div>
-            <table className="w-full">
-              <thead><tr className="border-b"><th className="text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider p-4">Borrower</th><th className="text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider p-4">Book</th><th className="text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider p-4">Borrow Date</th><th className="text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider p-4">Due Date</th><th className="text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider p-4">Status</th></tr></thead>
-              <tbody>
+            {/* Mobile Card View */}
+            <div className="block md:hidden space-y-3 p-3 sm:p-4">
+              {loans.filter(l => l.status !== 'returned' && (user.yearLevel ? books.find(b => b.id === l.bookId)?.yearLevel === user.yearLevel : true)).length === 0 ? (
+                <p className="p-4 text-center text-muted-foreground text-xs sm:text-sm">No active borrowers</p>
+              ) : loans.filter(l => l.status !== 'returned' && (user.yearLevel ? books.find(b => b.id === l.bookId)?.yearLevel === user.yearLevel : true)).map(l => (
+                <div key={l.id} className="border rounded-lg p-3 sm:p-4 space-y-2 hover:bg-muted/50 transition-colors">
+                  <div className="flex justify-between items-start gap-2">
+                    <div className="flex-1 min-w-0">
+                      <p className="font-semibold text-sm">{getBorrowerName(l.borrowerId)}</p>
+                      <p className="text-xs text-muted-foreground truncate">{getBookTitle(l.bookId)}</p>
+                      <p className="text-xs text-muted-foreground">Borrowed: {l.borrowDate}</p>
+                    </div>
+                    <span className={`text-xs font-semibold px-2 py-1 rounded whitespace-nowrap flex-shrink-0 ${l.status === 'active' ? 'bg-success/10 text-success' : 'bg-warning/10 text-warning'}`}>{l.status}</span>
+                  </div>
+                  <p className="text-xs text-muted-foreground">Due: {l.dueDate}</p>
+                </div>
+              ))}
+            </div>
+            {/* Desktop Table View */}
+            <div className="hidden md:block overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead><tr className="border-b"><th className="text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider p-4">Borrower</th><th className="text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider p-4">Book</th><th className="text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider p-4">Borrow Date</th><th className="text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider p-4">Due Date</th><th className="text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider p-4">Status</th></tr></thead>
+                <tbody>
                 {loans.filter(l => l.status !== 'returned' && (user.yearLevel ? books.find(b => b.id === l.bookId)?.yearLevel === user.yearLevel : true)).length === 0 ? (
                   <tr><td colSpan={5} className="p-8 text-center text-muted-foreground">No active borrowers</td></tr>
                 ) : loans.filter(l => l.status !== 'returned' && (user.yearLevel ? books.find(b => b.id === l.bookId)?.yearLevel === user.yearLevel : true)).map(l => (
@@ -318,7 +365,8 @@ export default function LibrarianDashboard() {
                 ))}
               </tbody>
             </table>
-          </div>
+              </div>
+            </div>
         )}
 
         {tab === 'reservations' && (

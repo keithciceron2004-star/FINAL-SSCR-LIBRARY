@@ -98,6 +98,34 @@ export const setBooks = (books: Book[]) => setStore('lms_books', books);
 export const getLoans = () => getStore<Loan>('lms_loans', []);
 export const setLoans = (loans: Loan[]) => setStore('lms_loans', loans);
 
+// Cascading delete: Remove a user and all their associated loans
+export const deleteUserCascade = (userId: string): void => {
+  const users = getUsers();
+  const loans = getLoans();
+  
+  // Remove the user
+  const updatedUsers = users.filter(u => u.id !== userId);
+  setUsers(updatedUsers);
+  
+  // Remove all loans for this user
+  const updatedLoans = loans.filter(l => l.borrowerId !== userId);
+  setLoans(updatedLoans);
+};
+
+// Cascading delete: Remove a book and all its associated loans
+export const deleteBookCascade = (bookId: string): void => {
+  const books = getBooks();
+  const loans = getLoans();
+  
+  // Remove the book
+  const updatedBooks = books.filter(b => b.id !== bookId);
+  setBooks(updatedBooks);
+  
+  // Remove all loans for this book
+  const updatedLoans = loans.filter(l => l.bookId !== bookId);
+  setLoans(updatedLoans);
+};
+
 export const resetDefaults = () => {
   setUsers(DEFAULT_USERS);
   setBooks(DEFAULT_BOOKS);

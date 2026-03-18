@@ -25,50 +25,50 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-background px-4">
-      <div className="flex flex-col items-center mb-8 animate-fade-in">
-        <img src={logoUrl} alt="SSCR logo" className="w-20 h-20 rounded-full mb-4 object-cover bg-white/5" />
-        <h1 className="text-2xl font-bold text-foreground">San Sebastian College Recoletos</h1>
-        <p className="text-muted-foreground text-sm italic mt-1">Caritas Et Scientia</p>
+    <div className="min-h-screen flex flex-col items-center justify-center bg-background px-3 sm:px-4 py-4 sm:py-8">
+      <div className="flex flex-col items-center mb-6 sm:mb-8 animate-fade-in">
+        <img src={logoUrl} alt="SSCR logo" className="w-16 h-16 sm:w-20 sm:h-20 rounded-full mb-3 sm:mb-4 object-cover bg-white/5" />
+        <h1 className="text-xl sm:text-2xl font-bold text-foreground text-center">San Sebastian College Recoletos</h1>
+        <p className="text-muted-foreground text-xs sm:text-sm italic mt-1">Caritas Et Scientia</p>
       </div>
 
-      <div className="w-full max-w-xs bg-card rounded-xl border p-6 space-y-4 animate-scale-in shadow-sm">
+      <div className="w-full max-w-xs bg-card rounded-xl border p-4 sm:p-6 space-y-3 sm:space-y-4 animate-scale-in shadow-sm">
         <div className="relative">
-          <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+          <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground flex-shrink-0" />
           <Input
             placeholder="School ID / Username"
             value={schoolId}
             onChange={e => setSchoolId(e.target.value)}
-            className="pl-10 transition-shadow focus:shadow-md h-9"
+            className="pl-10 transition-shadow focus:shadow-md h-9 sm:h-10 text-sm"
             onKeyDown={e => e.key === 'Enter' && handleLogin()}
             autoFocus
           />
         </div>
         <div className="relative">
-          <KeyRound className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+          <KeyRound className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground flex-shrink-0" />
           <Input
             type="password"
             placeholder="Password"
             value={password}
             onChange={e => setPassword(e.target.value)}
-            className="pl-10 transition-shadow focus:shadow-md h-9"
+            className="pl-10 transition-shadow focus:shadow-md h-9 sm:h-10 text-sm"
             onKeyDown={e => e.key === 'Enter' && handleLogin()}
           />
         </div>
-        <div className="flex items-center justify-between">
-          <label className="flex items-center gap-2 text-sm text-muted-foreground">
-            <Checkbox /> Remember for 30 Days
+        <div className="flex items-center justify-between gap-2">
+          <label className="flex items-center gap-2 text-xs sm:text-sm text-muted-foreground">
+            <Checkbox /> <span className="hidden sm:inline">Remember for 30 Days</span><span className="sm:hidden">Remember</span>
           </label>
         </div>
-        <Button onClick={handleLogin} className="w-full bg-maroon hover:bg-maroon/90 text-maroon-foreground font-semibold transition-all hover:shadow-md active:scale-[0.98]">
+        <Button onClick={handleLogin} className="w-full bg-maroon hover:bg-maroon/90 text-maroon-foreground font-semibold transition-all hover:shadow-md active:scale-[0.98] h-9 sm:h-10 text-sm">
           Sign in
         </Button>
         <div className="text-right mt-2">
-          <button onClick={() => setForgotOpen(true)} className="text-sm text-maroon font-medium hover:underline transition-colors">Forgot Password</button>
+          <button onClick={() => setForgotOpen(true)} className="text-xs sm:text-sm text-maroon font-medium hover:underline transition-colors">Forgot Password</button>
         </div>
       </div>
 
-      <p className="mt-8 text-xs text-muted-foreground">© 2026 San Sebastian College Recoletos – Library</p>
+      <p className="mt-6 sm:mt-8 text-xs text-muted-foreground text-center px-2">© 2026 San Sebastian College Recoletos – Library</p>
 
       <ForgotPasswordDialog open={forgotOpen} onClose={() => setForgotOpen(false)} />
     </div>

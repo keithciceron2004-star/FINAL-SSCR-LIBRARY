@@ -91,38 +91,67 @@ export default function BorrowerDashboard() {
         </div>
 
         {myLoans.length === 0 ? (
-          <div className="bg-card rounded-lg border p-12 text-center mb-8">
-            <BookOpen className="w-10 h-10 mx-auto text-muted-foreground mb-3" />
-            <p className="text-muted-foreground">No active loans. Browse books to get started.</p>
+          <div className="bg-card rounded-lg border p-6 sm:p-8 text-center mb-6 sm:mb-8">
+            <BookOpen className="w-8 sm:w-10 h-8 sm:h-10 mx-auto text-muted-foreground mb-2 sm:mb-3" />
+            <p className="text-sm sm:text-base text-muted-foreground">No active loans. Browse books to get started.</p>
           </div>
         ) : (
-          <div className="bg-card rounded-lg border mb-8 overflow-hidden">
-            <table className="w-full">
-              <thead><tr className="border-b"><th className="text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider p-4">Book</th><th className="text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider p-4">Borrow Date</th><th className="text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider p-4">Due Date</th><th className="text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider p-4">Status</th><th className="text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider p-4">Actions</th></tr></thead>
-              <tbody>
-                {myLoans.map(loan => (
-                  <tr key={loan.id} className="border-b last:border-0 transition-colors hover:bg-muted/50">
-                    <td className="p-4 text-sm font-medium">{getBookTitle(loan.bookId)}</td>
-                    <td className="p-4 text-sm text-muted-foreground">{loan.borrowDate}</td>
-                    <td className="p-4 text-sm text-muted-foreground">{loan.dueDate}</td>
-                    <td className="p-4">
-                      <span className={`text-xs font-semibold px-2 py-1 rounded ${loan.status === 'active' ? 'bg-success/10 text-success' : 'bg-warning/10 text-warning'}`}>
-                        {loan.status === 'active' ? 'Active' : loan.status === 'pending_return' ? 'Pending Return' : 'Pending Renewal'}
-                      </span>
-                    </td>
-                    <td className="p-4 flex gap-2">
-                      {loan.status === 'active' && (
-                        <>
-                          <Button size="sm" variant="outline" onClick={() => handleReturn(loan.id)} className="transition-all active:scale-[0.98]">Return</Button>
-                          <Button size="sm" variant="outline" onClick={() => handleRenewal(loan.id)} className="transition-all active:scale-[0.98]">Renew</Button>
-                        </>
-                      )}
-                      {loan.status !== 'active' && <span className="text-xs text-muted-foreground">Waiting for approval</span>}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+          <div className="bg-card rounded-lg border mb-6 sm:mb-8 overflow-hidden">
+            {/* Mobile Card View */}
+            <div className="block md:hidden space-y-3 p-3 sm:p-4">
+              {myLoans.map(loan => (
+                <div key={loan.id} className="border rounded-lg p-3 sm:p-4 space-y-2 hover:bg-muted/50 transition-colors">
+                  <div className="flex justify-between items-start gap-2">
+                    <div className="flex-1 min-w-0">
+                      <p className="font-semibold text-sm truncate">{getBookTitle(loan.bookId)}</p>
+                      <p className="text-xs text-muted-foreground">Borrowed: {loan.borrowDate}</p>
+                      <p className="text-xs text-muted-foreground">Due: {loan.dueDate}</p>
+                    </div>
+                    <span className={`text-xs font-semibold px-2 py-1 rounded whitespace-nowrap flex-shrink-0 ${loan.status === 'active' ? 'bg-success/10 text-success' : 'bg-warning/10 text-warning'}`}>
+                      {loan.status === 'active' ? 'Active' : loan.status === 'pending_return' ? 'Pending' : 'Renew'}
+                    </span>
+                  </div>
+                  {loan.status === 'active' ? (
+                    <div className="flex gap-1 flex-wrap pt-2">
+                      <Button size="sm" variant="outline" onClick={() => handleReturn(loan.id)} className="text-xs flex-1 h-8">Return</Button>
+                      <Button size="sm" variant="outline" onClick={() => handleRenewal(loan.id)} className="text-xs flex-1 h-8">Renew</Button>
+                    </div>
+                  ) : (
+                    <p className="text-xs text-muted-foreground pt-2">Awaiting approval</p>
+                  )}
+                </div>
+              ))}
+            </div>
+            
+            {/* Desktop Table View */}
+            <div className="hidden md:block overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead><tr className="border-b"><th className="text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider p-4">Book</th><th className="text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider p-4">Borrow Date</th><th className="text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider p-4">Due Date</th><th className="text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider p-4">Status</th><th className="text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider p-4">Actions</th></tr></thead>
+                <tbody>
+                  {myLoans.map(loan => (
+                    <tr key={loan.id} className="border-b last:border-0 transition-colors hover:bg-muted/50">
+                      <td className="p-4 text-sm font-medium">{getBookTitle(loan.bookId)}</td>
+                      <td className="p-4 text-sm text-muted-foreground">{loan.borrowDate}</td>
+                      <td className="p-4 text-sm text-muted-foreground">{loan.dueDate}</td>
+                      <td className="p-4">
+                        <span className={`text-xs font-semibold px-2 py-1 rounded ${loan.status === 'active' ? 'bg-success/10 text-success' : 'bg-warning/10 text-warning'}`}>
+                          {loan.status === 'active' ? 'Active' : loan.status === 'pending_return' ? 'Pending Return' : 'Pending Renewal'}
+                        </span>
+                      </td>
+                      <td className="p-4 flex gap-2">
+                        {loan.status === 'active' && (
+                          <>
+                            <Button size="sm" variant="outline" onClick={() => handleReturn(loan.id)} className="transition-all active:scale-[0.98]">Return</Button>
+                            <Button size="sm" variant="outline" onClick={() => handleRenewal(loan.id)} className="transition-all active:scale-[0.98]">Renew</Button>
+                          </>
+                        )}
+                        {loan.status !== 'active' && <span className="text-xs text-muted-foreground">Waiting for approval</span>}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
         )}
 
