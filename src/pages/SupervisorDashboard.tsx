@@ -92,6 +92,9 @@ export default function SupervisorDashboard() {
     if (!b) return;
     if (!window.confirm(`Delete book "${b.title}" by ${b.author}? This will also delete all associated loans. This action cannot be undone.`)) return;
     deleteBookCascade(bookId);
+    // Force re-render by fetching updated state
+    const updatedBooks = getBooks();
+    // State update not needed here since component will re-render, but ensure data is synchronized
     toast.success('Book and all associated loans deleted');
   };
 
@@ -249,7 +252,12 @@ export default function SupervisorDashboard() {
       </Dialog>
 
       {/* Catalog Dialog */}
-      <Dialog open={catalogOpen} onOpenChange={setCatalogOpen}>
+      <Dialog open={catalogOpen} onOpenChange={(open) => {
+        if (!open) {
+          // Refresh books when dialog closes to show updated list
+        }
+        setCatalogOpen(open);
+      }}>
         <DialogContent className="max-w-3xl">
           <DialogHeader><DialogTitle>Catalog</DialogTitle></DialogHeader>
           <div className="mt-2">

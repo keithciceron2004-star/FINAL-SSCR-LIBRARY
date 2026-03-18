@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { User, KeyRound } from 'lucide-react';
+import { User, KeyRound, Eye, EyeOff } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -13,6 +13,7 @@ const logoUrl = `${import.meta.env.BASE_URL}favicon.png`;
 export default function Login() {
   const [schoolId, setSchoolId] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [forgotOpen, setForgotOpen] = useState(false);
   const navigate = useNavigate();
 
@@ -45,15 +46,23 @@ export default function Login() {
           />
         </div>
         <div className="relative">
-          <KeyRound className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground flex-shrink-0" />
+          <KeyRound className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground flex-shrink-0 pointer-events-none" />
           <Input
-            type="password"
+            type={showPassword ? 'text' : 'password'}
             placeholder="Password"
             value={password}
             onChange={e => setPassword(e.target.value)}
-            className="pl-10 transition-shadow focus:shadow-md h-9 sm:h-10 text-sm"
+            className="pl-10 pr-10 transition-shadow focus:shadow-md h-9 sm:h-10 text-sm"
             onKeyDown={e => e.key === 'Enter' && handleLogin()}
           />
+          <button
+            type="button"
+            onClick={() => setShowPassword(!showPassword)}
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+            title={showPassword ? 'Hide password' : 'Show password'}
+          >
+            {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+          </button>
         </div>
         <div className="flex items-center justify-between gap-2">
           <label className="flex items-center gap-2 text-xs sm:text-sm text-muted-foreground">
